@@ -149,7 +149,23 @@ class ContentApiResourceArticles extends ApiResource
 			unset($subArray->displayDate);
 		}
 
-		return $rows;
+		$obj = new stdclass;
+
+		if (count($rows) > 0)
+		{
+			$obj->code = '200';
+			$obj->message = 'true';
+			$obj->data = $rows;
+
+			return $obj;
+		}
+		else
+		{
+			$obj->code = 'ERROR001';
+			$obj->message = 'System does not have articles';
+		}
+
+		return $obj;
 	}
 
 	/**
@@ -186,7 +202,7 @@ class ContentApiResourceArticles extends ApiResource
 		if (empty($app->input->get('title', '', 'STRING')))
 		{
 			$obj->code = 'ER001';
-			$obj->message = 'Title is Missing';
+			$obj->message = 'Title Field is Missing';
 
 			return $obj;
 		}
@@ -194,7 +210,7 @@ class ContentApiResourceArticles extends ApiResource
 		if (empty($app->input->get('introtext', '', 'STRING')))
 		{
 			$obj->code = 'ER002';
-			$obj->message = 'Introtext is Missing';
+			$obj->message = 'Introtext id is Missing';
 
 			return $obj;
 		}
@@ -262,6 +278,5 @@ class ContentApiResourceArticles extends ApiResource
 		}
 
 		return true;
-
 	}
 }
