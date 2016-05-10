@@ -155,7 +155,7 @@ class ContentApiResourceArticles extends ApiResource
 		{
 			$obj->code = '200';
 			$obj->message = 'true';
-			$obj->data = $rows;
+			$obj->{'data.results'} = $rows;
 
 			return $obj;
 		}
