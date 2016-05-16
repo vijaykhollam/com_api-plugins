@@ -50,7 +50,6 @@ class ContentApiResourceArticles extends ApiResource
 	public function getArticles()
 	{
 		$app = JFactory::getApplication();
-		$result = new stdClass;
 		$items = array();
 		$article_id = $app->input->get('id', 0, 'INT');
 		$catid = $app->input->get('category_id', 0, 'INT');
@@ -122,6 +121,8 @@ class ContentApiResourceArticles extends ApiResource
 
 		$rows = $art_obj->getItems();
 
+		$num_articles = $art_obj->getTotal();
+
 		foreach ($rows as $subKey => $subArray)
 		{
 			if ($subArray->catid)
@@ -131,7 +132,7 @@ class ContentApiResourceArticles extends ApiResource
 
 			if ($subArray->created_by)
 			{
-				$subArray->created_by = array('id' => $subArray->created_by,'name' => $subArray->author);
+				$subArray->created_by = array('id' => $subArray->created_by, 'name' => $subArray->author);
 			}
 
 			if ($subArray->images)
@@ -182,17 +183,20 @@ class ContentApiResourceArticles extends ApiResource
 		}
 
 		$obj = new stdclass;
+		$result = new stdClass;
 
 		if (count($rows) > 0)
 		{
-			$obj->success = 'true';
-			$obj->{'data'} = array('results' => $rows, 'total' => count($rows));
+			$result->results = $rows;
+			$result->total = $num_articles;
+			$obj->success = true;
+			$obj->{'data'} = $result;
 
 			return $obj;
 		}
 		else
 		{
-			$obj->success = 'false';
+			$obj->success = false;
 			$obj->message = 'System does not have articles';
 		}
 
@@ -232,7 +236,7 @@ class ContentApiResourceArticles extends ApiResource
 
 		if (empty($app->input->get('title', '', 'STRING')))
 		{
-			$obj->success = 'false';
+			$obj->success = false;
 			$obj->message = 'Title is Missing';
 
 			return $obj;
@@ -240,7 +244,7 @@ class ContentApiResourceArticles extends ApiResource
 
 		if (empty($app->input->get('introtext', '', 'STRING')))
 		{
-			$obj->success = 'false';
+			$obj->success = false;
 			$obj->message = 'Introtext is Missing';
 
 			return $obj;
@@ -248,7 +252,7 @@ class ContentApiResourceArticles extends ApiResource
 
 		if (empty($app->input->get('catid', '', 'INT')))
 		{
-			$obj->success = 'false';
+			$obj->success = false;
 			$obj->message = 'Category id is Missing';
 
 			return $obj;
@@ -273,7 +277,7 @@ class ContentApiResourceArticles extends ApiResource
 			// Bind data
 			if (!$article->bind($data))
 			{
-				$obj->success = 'false';
+				$obj->success = false;
 				$obj->message = $article->getError();
 
 				return $obj;
@@ -296,7 +300,7 @@ class ContentApiResourceArticles extends ApiResource
 		// Check the data.
 		if (!$article->check())
 		{
-			$obj->success = 'false';
+			$obj->success = false;
 			$obj->message = $article->getError();
 
 			return $obj;
@@ -305,7 +309,7 @@ class ContentApiResourceArticles extends ApiResource
 		// Store the data.
 		if (!$article->store())
 		{
-			$obj->success = 'false';
+			$obj->success = false;
 			$obj->message = $article->getError();
 
 			return $obj;
@@ -322,9 +326,11 @@ class ContentApiResourceArticles extends ApiResource
 		}
 
 		$article->images = $images;
+		$result = new stdClass;
+		$result->results = $article;
 
-		$obj->success = 'true';
-		$obj->{'data'} = array('results' => $article);
+		$obj->success = true;
+		$obj->{'data'} = $result;
 
 		return $obj;
 	}
